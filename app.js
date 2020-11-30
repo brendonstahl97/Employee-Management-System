@@ -18,6 +18,3 @@ connection.connect(err => {
     console.log(`CONNECTED ON THREAD ${connection.threadId}`);
     options.getOption();
 })
-
-
-

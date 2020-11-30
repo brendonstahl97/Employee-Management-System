@@ -75,8 +75,6 @@ class Options {
             console.log('\n');
             this.getOption();
         })
-
-
     }
 
     viewRoles() {
@@ -87,19 +85,71 @@ class Options {
             console.log('\n');
             this.getOption();
         })
-
     }
 
-    addDepartment() {
-        this.connection.query();
+    async addDepartment() {
+        const { deptName } = await inquirer.prompt([
+            {
+                type: 'input',
+                message: 'What is the name of the new department?',
+                name: 'deptName'
+            }
+        ])
+
+        this.connection.query(`INSERT INTO department (name) VALUES ('${deptName}')`, (err, res) => {
+            if (err) throw error;
+            console.log(`${deptName} added to Departments!`);
+            this.getOption();
+        });
     }
 
-    addEmployee() {
-        this.connection.query();
+    async addEmployee() {
+
+        this.connection.query(`SELECT title FROM role`, async (err, res) => {
+            if (err) throw err;
+            let roles = [];
+            res.forEach(element => {
+                roles.push(element.title);
+            })
+
+
+            const { employeeFirstName, employeeLastName, employeeRole } = await inquirer.prompt([
+                {
+                    type: 'input',
+                    message: 'What is the first name of the new employee?',
+                    name: 'employeeFirstName'
+                },
+                {
+                    type: 'input',
+                    message: 'What is the last name of the new employee?',
+                    name: 'employeeLastName'
+                },
+                {
+                    type: 'list',
+                    message: 'What role does the employee have',
+                    choices: roles,
+                    name: 'employeeRole'
+                }
+            ])
+
+            const roleNum = roles.findIndex(element => {
+                return element == employeeRole;
+            })
+
+            this.connection.query(`INSERT INTO employee (first_name, last_name, role_id) VALUES ('${employeeFirstName}', '${employeeLastName}', '${roleNum}')`, (err, res) => {
+                if (err) throw error;
+                // console.log(`${deptName} added to Departments!`);
+                this.getOption();
+            });
+
+        });
+
+
     }
 
     addRole() {
         this.connection.query();
+
     }
 }
 
