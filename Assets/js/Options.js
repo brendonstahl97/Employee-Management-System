@@ -67,7 +67,6 @@ class Options {
     }
 
     viewDepartments() {
-        console.log('mega Dept call');
         this.connection.query(`SELECT name AS 'Department' FROM department;`, (err, res) => {
             if (err) throw err;
             console.log('\n');
@@ -136,20 +135,54 @@ class Options {
                 return element == employeeRole;
             })
 
-            this.connection.query(`INSERT INTO employee (first_name, last_name, role_id) VALUES ('${employeeFirstName}', '${employeeLastName}', '${roleNum}')`, (err, res) => {
+            this.connection.query(`INSERT INTO employee (first_name, last_name, role_id) VALUES ('${employeeFirstName}', '${employeeLastName}', '${roleNum + 1}')`, (err, res) => {
                 if (err) throw error;
-                // console.log(`${deptName} added to Departments!`);
+                console.log(`${employeeFirstName} ${employeeLastName} added!`);
                 this.getOption();
             });
 
         });
-
-
     }
 
     addRole() {
-        this.connection.query();
 
+        this.connection.query(`SELECT name FROM department`, async (err, res) => {
+            if (err) throw err;
+            let departments = [];
+            res.forEach(element => {
+                departments.push(element.name);
+            })
+
+            const { title, salary, department } = await inquirer.prompt([
+                {
+                    type: 'input',
+                    message: 'What is the title of the new role?',
+                    name: 'title'
+                },
+                {
+                    type: 'number',
+                    message: 'What is the salary of the new role?',
+                    name: 'salary'
+                },
+                {
+                    type: 'list',
+                    message: 'What depatment does the role belong to?',
+                    choices: departments,
+                    name: 'department'
+                }
+            ])
+
+            const deptNum = departments.findIndex(element => {
+                return element == department;
+            })
+
+            this.connection.query(`INSERT INTO role (title, salary, department_id) VALUES ('${title}', '${salary}', '${deptNum + 1}')`, (err, res) => {
+                if (err) throw error;
+                console.log(`${title} added to Roles!`);
+                this.getOption();
+            });
+
+        });
     }
 }
 
